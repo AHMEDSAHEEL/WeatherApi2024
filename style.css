@@ -12,7 +12,7 @@ body {
    padding: 0px;
    margin: 0px;
    height: 100vh;
-   background: linear-gradient(135deg, #001305, #7fac15, #15610f, #237229, #038C65);
+   background: linear-gradient(135deg, #1359cb, #12a1d1, #5ccbc9, #10d8eb, #1359cb);
 }
 
 #gradient {
@@ -29,7 +29,7 @@ body {
     transform: translate(-50%, -50%);
     width: 100%;
     max-width: 450px;
-    background: linear-gradient(135deg, #001305, #7fac15, #063102, #246328, #038C65);
+    background: linear-gradient(135deg, #1359cb, #0a6b8c, #0eabbd, #037091, #1359cb);
     color: #fff;
     margin: 0 auto 0;
     border-radius: 12px;
