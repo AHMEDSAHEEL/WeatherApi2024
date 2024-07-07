@@ -10,14 +10,12 @@
 </head>
 
 <body>
-<!--   IF YOU WANTED ANIMATED GRADIENT BACKGROUND IN THIS PROJECT PLEASE UNCOMMENT THE HTML TAG WITH 'gradient' ID AND ALSO UNCOMMENT THE JAVASCRIPT CODE ALSO -->
-<!-- <div id="gradient"> -->
   <div class="card">
     <div class="search-field">
-      <input type="text" , placeholder="Name of your city" spellcheck="false" class="input" />
+      <input type="text" placeholder="Name of your city" spellcheck="false" class="input" />
       <button><img src="images/search.jpg" alt="" /></button>
     </div>
-    <div class="weather-details">
+    <div class="weather-details" style="display: none;">
       <div class="place">
         <img src="https://openweathermap.org/img/wn/10d@2x.png" alt="" class="weatherIcon" />
         <h1 class="temperature">28°C</h1>
@@ -47,53 +45,61 @@
         </div>
       </div>
     </div>
-    <div class="error">
-      <h3 style="color: red;">Invalid City Name</h3>
-    </div>
+    
+    <h3 class="error" style="display: none;">Invalid City Name</h3>
   </div>
-<!-- </div> -->
+  
   <script>
     const apiSecret = "14bee326c01037395e24044b7363c650";
-    const apiUrl =
-      "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
-  
+    const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
     const searchField = document.querySelector(".search-field input");
     const searchButton = document.querySelector(".search-field button");
-    const input=document.querySelector('.input').value.trim();
 
-    async function getWeatherDetails(cit) {
-      const city=cit.trim();
-    
-      try{
-      const response = await fetch(apiUrl + city + `&appid=${apiSecret}`);
-      if(response.status=400 || input==='')
-    {
-      document.querySelector('.error').style.display="block";
+    async function getWeatherDetails(city) {
+      const trimmedCity = city.trim();
+      if (trimmedCity === '') {
+        displayError("Please enter a city name.");
+        return;
+      }
+
+      try {
+        const response = await fetch(apiUrl + trimmedCity + `&appid=${apiSecret}`);
+        if (!response.ok) {
+          if (response.status === 400 || response.status === 404) {
+            displayError("City not found. Please enter a valid city name.");
+          } else {
+            displayError("An error occurred. Please try again.");
+          }
+          return;
+        }
+
+        const data = await response.json();
+        updateWeatherDetails(data);
+      } catch (err) {
+        console.error(err);
+        displayError("An error occurred. Please try again.");
+      }
     }
-    
-    document.querySelector('.error').style.display="none";
-      var data = await response.json();
-       console.log(data)
-      document.querySelector(".city").innerHTML = data["name"];
-      document.querySelector(".temperature").innerHTML =
-        parseInt(data["main"]["temp"]).toString() + " °C";
-      document.querySelector(".humidity").innerHTML =
-        data["main"]["humidity"] + "%";
-      document.querySelector(".pressure").innerHTML =
-        data["main"]["pressure"] + " Pa";
-      document.querySelector(".wind-speed").innerHTML =
-        data["wind"]["speed"] + " KM/H";
-      document.querySelector(
-        ".weatherIcon"
-      ).src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
 
-      document.querySelector(".weather-details").style.display = "flex";
-
-      console.log(data);
-    }catch(err){
-      console.log(err);
+    function displayError(message) {
+      const errorElement = document.querySelector('.error');
+      errorElement.textContent = message;
+      errorElement.style.display = "block";
+      document.querySelector('.weather-details').style.display = "none";
     }
-  }
+
+    function updateWeatherDetails(data) {
+      document.querySelector('.error').style.display = "none";
+      document.querySelector('.weather-details').style.display = "flex";
+
+      document.querySelector(".city").innerHTML = data.name;
+      document.querySelector(".temperature").innerHTML = parseInt(data.main.temp).toString() + " °C";
+      document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+      document.querySelector(".pressure").innerHTML = data.main.pressure + " Pa";
+      document.querySelector(".wind-speed").innerHTML = data.wind.speed + " KM/H";
+      document.querySelector(".weatherIcon").src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+    }
 
     searchButton.addEventListener("click", () => {
       getWeatherDetails(searchField.value);
